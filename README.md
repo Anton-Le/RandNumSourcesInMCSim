@@ -46,6 +46,40 @@ The Quantum Dice QRNG device library is optional and only required if one has ac
 If you have access to such a device the library files should be placed in `lib/QRNGlibrary/lib`
 and the headers in `lib/QRNGlibrary/include` for CMake to include them automatically.
 
+
+## Tina's Random Number Generator library (trng)
+
+In a parallel environment we elect to use a dedicated parallel pseudo-random number generator. 
+Due to the [scalable parallel random number generator library](http://sprng.cs.fsu.edu/) (SPRNG) being outdated
+we elected to use [Tina's random number generator library](https://www.numbercrunch.de/trng), unfortunately abbreviated
+to TRNG. Specifically we use [v4.24 of TRNG](https://github.com/rabauke/trng4/tree/v4.24) and therein the parallel
+PRNGs `mrg5`, `mrg5s` and `yarn5` following the rule-of-thumb often presented in introductions to MC simulations
+of preferring PRNGs with long periods.
+
+The source code expects the library to be located in the `lib/trng-library/lib64` directory and the 
+library headers to be present in `lib/trng-library/include` directory.
+
+**Note**: The functionality used in the present code has been tested with TRNG v4.15 and is likely to work
+with older versions, too. Hence should the compilation of the newer version fail we suggest using an older version,
+whose build requirements are less demanding.
+
+### Compilation
+
+To compile TRNG first initialise and update the submodule
+`git submodule init`
+
+`git submodule update`
+
+Then create a `build` directory in `lib/trng` and step down into it:
+`mkdir build && cd build`
+
+Configure the library to compile without using CUDA and without additional tests. The latter is to prevent configuration failures
+due to a missing [Catch2](https://github.com/catchorg/Catch2) test framework. Omission of the tests does not impact the functionality
+of the code.
+`cmake -DTRNG_ENABLE_TESTS=OFF`
+`make && make install`
+
+
 # Additional programs
 
 Apart from the direct sampling Monte Carlo calculation of $\pi$ this repository also contains programs used

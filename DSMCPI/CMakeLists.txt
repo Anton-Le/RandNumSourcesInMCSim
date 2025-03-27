@@ -15,7 +15,7 @@ enable_language(C)
 
 #add BOOST dependency, requires CXX enabled
 find_package(Boost COMPONENTS program_options REQUIRED)
-#add OpenMP a requirement
+#add OpenMP as requirement
 find_package(OpenMP)
 
 #Check if the QRNG API header is present
@@ -38,7 +38,8 @@ endif()
 
 #add header directories
 include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
+#TRNG sources
+include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/../lib/trng-library/include)
 #Collect source files from the source directory and store them in the `sources` variable
 file(GLOB sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
@@ -59,3 +60,6 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../lib/QRNGlibrary/include/qrng_api.h)
     message( INFO "Linking to " ${PCAP_LIBRARY})
     target_link_libraries(DSMCPI PUBLIC ${PCAP_LIBRARY})
 endif()
+#add TRNG
+message( INFO "Linking to parallel PRNG library: Tina's Random Number Generator Library")
+target_link_libraries(DSMCPI PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../lib/trng-library/lib64/libtrng4.a)

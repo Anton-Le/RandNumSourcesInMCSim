@@ -15,6 +15,7 @@
 #include <functional>
 #include <cstdint>
 #include <omp.h>
+#include <trng/mrg5s.hpp>
 
 #include "supportFunctions.h"
 #include "QRNGRandomDevice.h"
@@ -79,11 +80,15 @@ main ( int argc, char** argv )
     {
         rngInitStart = std::chrono::system_clock::now ( );
         int threadId = omp_get_thread_num();
+        const uint numThreads(omp_get_num_threads());
 #ifndef QRNG
         std::cout << "Using PRNG" << std::endl;
-        std::mt19937 generator;
-        //std::ranlux48 generator;
-        generator.seed(rngSeed + threadId);
+        trng::mrg5s generator;
+        generator.seed(static_cast<unsigned long>(rngSeed) );
+        // sequence splitting/leapfrogging
+        generator.split(numThreads, threadId);
+        // block splitting
+        //generator.jump( dim * (threadId * nSamples / numThreads) );
 #else
         //-------------- QRNG - INIT
         std::cout << "Using QRNG" << std::endl;
