@@ -14,7 +14,7 @@ entropy:
  '8': /programs/extension/QDice_tests/entropyFiles/entropyFile_8.bin
  '9': /programs/extension/QDice_tests/entropyFiles/entropyFile_8.bin
  '10': /programs/extension/QDice_tests/entropyFiles/entropyFile_10.bin
-repoPath: '/programs/projects/MCMCMI_QRNG'
+repoPath: '<abs. path to the entire repository>'
 # visualisation parameters
 maxY: 0.085
 minY: 0.04

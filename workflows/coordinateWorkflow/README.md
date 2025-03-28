@@ -2,9 +2,9 @@
 
 ## Workflow files
 
-1. `Snakefile_QRNG`
-2. `Snakefile_PRNG`
-3. `coord_snakemake.yaml`
+1. `Snakefile_QRNG.smk`
+2. `Snakefile_PRNG.smk`
+3. `coord_QRNG_snakemake.yaml`
 4. `coord_PRNG_snakemake.yaml`
 
 ## Description
@@ -13,11 +13,11 @@ This workflow encompasses compilation of the code, generation of points on [0,1]
 and aggreagation as well as visualisation of the statistics of the maximal nearest-neighbour distance
 and the largest empty sphere radius.
 
-**Caveat**: Currently the restirction to `d=2` applies.
+**Caveat**: Currently the restirction of the evaluation to `d=2` applies.
 
 The QRNG workflow performs, in general, the following steps:
-1. Copy the source code directory tree from the `/ToyExamples` directory of the provided `repoPath` into
-a directory in `./src` indexed by the `entropy` index (file number).
+1. Copy the source code directory tree from the directory provided as `repoPath` into
+a directory in `./src` indexed by the `entropy` index (file number/seed number).
 2. Create a directory in `./build` indexed by the `entropy` index and the chosen `precision` (**single, double only**),
 substitute the file name provided as a source of entropy into the proxy functions in the code,
 run within it `cmake` with appropriate compiler flags and compile the code using `make`.
@@ -50,7 +50,7 @@ These are as follows:
 
 To compile the C++ code the requirements for it have to be fulfilled, too:
 1. Cmake (>3.20)
-2. PCAP
+2. PCAP (optional)
 3. QRNG library (optional).
 4. Boost.
 
@@ -61,16 +61,15 @@ To compile the C++ code the requirements for it have to be fulfilled, too:
 newly created directory.
 3. Rename the copied Snakefile, e.g. `Snakefile_PRNG.smk`, into `Snakefile`.
 4. Load the Python virtual environment in which Snakemake has been installed.
-5. Execute `snakemake --cores=1 vis/lesMeanValueStatistics.png` or `snakemake --cores=1 vis/nnMeanValueStatistics.png`, to collect statistics for 10
-repetitions (each with a different entropy file/rng seed).
+5. Execute `snakemake --cores=1 -s Snakefile.smk vis/lesMeanValueStatistics.png` or `snakemake --cores=1 -s Snakefile.smk  vis/nnMeanValueStatistics.png`,
+to collect statistics for 10 repetitions (each with a different entropy file/rng seed).
 
 The generation of one (LES or NN) plot in step 5 will run through the entire process of compilation and point generation, but will only
 execute the data aggregation and visualisation step (step 5 in the [##Description]) for the respective statistic (LES or NN).
 Re-running Snakemake with the other plot afterwards will only run the rules necessary to aggregate and visualise the data.
 
-
-## Rule description
-tbd.
+To use more than 10 different RNG seeds or binary entropy files modify the appropriate configuration file and expand the list of seeds and 
+change the upper limit of the range in line 4 of the associated Snakefile to cover the new range.
 
 ## Remarks
 

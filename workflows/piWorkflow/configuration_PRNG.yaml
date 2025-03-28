@@ -16,4 +16,4 @@ entropy:
  '8': 0
  '9': 1000000
  '10': 3
-repoPath: '/home/aquinox/bin/projects/MCMCMI_QRNG'
+repoPath: '<abs. path to repository>'

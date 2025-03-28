@@ -1,7 +1,7 @@
 configfile: "coord_QRNG_snakemake.yaml"
 
 precisions=['single', 'double']
-entropyFiles=[idx for idx in range(1,50+1)]
+entropyFiles=[idx for idx in range(1,10+1)]
 
 def getEntropyFiles(wildcards):
     return config["entropy"][wildcards.entropyFileIndex]
@@ -24,24 +24,11 @@ rule copyRepo:
     output:
         directory("src/{entropyFileIndex}")
     shell:
-        "cp -R {input.srcDir}/ToyExamples {output}"
-
-rule substituteEntropyFile:
-    input:
-        "src/{entropyFileIndex}/include/QRNGRandomDevice.h"
-    params:
-        entropyFile=getEntropyFiles
-    output:
-        touch("tmp/{entropyFileIndex}.complete")
-    shell:
-        "sed -i 's|/dev/random|{params.entropyFile}|g' {input}/include/QRNGRandomDevice.h"
-
-#ruleorder: substituteEntropyFile > copyRepo
+        "cp -R {input.srcDir} {output}"
 
 rule runCompilation:
     input:
         rules.copyRepo.output,
-        #"tmp/{entropyFileIndex}.complete"
     message: "{wildcards.precision} {wildcards.entropyFileIndex}"
     params:
         precisionOption=getCompileFlags,
@@ -49,9 +36,10 @@ rule runCompilation:
     output:
         directory("build/{entropyFileIndex}/{precision}")
     shell:
+        "sed -i 's|/dev/random|{params.entropyFile}|g' {input}/DSMCPI/include/QRNGRandomDevice.h && "
         "mkdir {output} && "
         "cd {output} && "
-        "cmake -DCMAKE_CXX_FLAGS='{params.precisionOption} -DQRNG -DQRNG_USE_DEVICE=1' ../../../{input}/nDCoordinates &&"
+        "cmake -DCMAKE_CXX_FLAGS='{params.precisionOption} -DQRNG -DQRNG_USE_DEVICE=0' ../../../{input}/nDCoordinates &&"
         "make"
 
 rule collectBinaries:
@@ -72,11 +60,10 @@ rule collectDataPoints:
         "run/{entropyFileIndex}/{precision}/coordinates.lst"
     params:
         numSamples=config['samples'],
-        dim=config['dim'],
-        seed=getEntropyFiles
+        dim=config['dim']
     threads: 1
     shell:
-        "./{input} --numSamplePoints {params.numSamples} --dimension {params.dim} --outfile {output} --initSeed {params.seed}"
+        "./{input} --numSamplePoints {params.numSamples} --dimension {params.dim} --outfile {output}"
 
 # visualisation & batch processing
 

@@ -16,4 +16,4 @@ entropy:
  '8': /programs/extension/QDice_tests/entropyFiles/entropyFile_8.bin
  '9': /programs/extension/QDice_tests/entropyFiles/entropyFile_8.bin
  '10': /programs/extension/QDice_tests/entropyFiles/entropyFile_10.bin
-repoPath: '/home/aquinox/bin/projects/MCMCMI_QRNG'
+repoPath: '<abs. path to repository>'
