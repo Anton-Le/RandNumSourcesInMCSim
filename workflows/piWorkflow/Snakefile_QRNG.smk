@@ -1,4 +1,4 @@
-configfile: "configuration.yaml"
+configfile: "configuration_QRNG.yaml"
 
 precisions=['single', 'double']
 entropyFiles=[idx for idx in range(1,10+1)]
@@ -24,24 +24,11 @@ rule copyRepo:
     output:
         directory("src/{entropyFileIndex}")
     shell:
-        "cp -R {input.srcDir}/ToyExamples {output}"
-
-rule substituteEntropyFile:
-    input:
-        "src/{entropyFileIndex}/include/QRNGRandomDevice.h"
-    params:
-        entropyFile=getEntropyFiles
-    output:
-        touch("tmp/{entropyFileIndex}.complete")
-    shell:
-        "sed -i 's|/dev/random|{params.entropyFile}|g' {input}/include/QRNGRandomDevice.h"
-
-#ruleorder: substituteEntropyFile > copyRepo
+        "cp -R {input.srcDir} {output}"
 
 rule runCompilation:
     input:
         rules.copyRepo.output,
-        #"tmp/{entropyFileIndex}.complete"
     message: "{wildcards.precision} {wildcards.entropyFileIndex}"
     params:
         precisionOption=getCompileFlags,
@@ -49,10 +36,10 @@ rule runCompilation:
     output:
         directory("build/{entropyFileIndex}/{precision}")
     shell:
-        "sed -i 's|/dev/random|{params.entropyFile}|g' {input}/include/QRNGRandomDevice.h && "
+        "sed -i 's|/dev/random|{params.entropyFile}|g' {input}/DSMCPI/include/QRNGRandomDevice.h && "
         "mkdir {output} && "
         "cd {output} && "
-        "cmake -DCMAKE_CXX_FLAGS='{params.precisionOption} -DQRNG -DQRNG_USE_DEVICE=0' ../../../{input} &&"
+        "cmake -DCMAKE_CXX_FLAGS='{params.precisionOption} -DQRNG -DQRNG_USE_DEVICE=0' ../../../{input}/DSMCPI &&"
         "make"
 
 rule collectBinaries:
@@ -74,7 +61,7 @@ rule copyAssayFiles:
     output:
         "run/{entropyFileIndex}/{precision}/assay.sh"
     shell:
-        "cp ./scripts/assay_template.sh {output}"
+        "cp ./scripts/assay_template_QRNG.sh {output}"
 
 rule instantiateAssayScript:
     input:
@@ -102,10 +89,9 @@ rule collectData:
         "run/{entropyFileIndex}/{precision}/assay.sh",
         "run/{entropyFileIndex}/{precision}/instantiated"
     output:
-        "run/{entropyFileIndex}/{precision}/results_assay_{entropyFileIndex}_*.txt"
         touch("run/{entropyFileIndex}/{precision}/completed")
     threads: 1
     shell:
+        "cd run/{wildcards.entropyFileIndex}/{wildcards.precision} && "
         "./assay.sh"
 
-# visualisation & batch processing

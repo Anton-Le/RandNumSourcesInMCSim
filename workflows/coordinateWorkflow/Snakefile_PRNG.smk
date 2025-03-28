@@ -1,7 +1,7 @@
 configfile: "coord_PRNG_snakemake.yaml"
 
 precisions=['single', 'double']
-entropyFiles=[idx for idx in range(1,50+1)]
+entropyFiles=[idx for idx in range(1,10+1)]
 
 def getEntropyFiles(wildcards):
     return config["entropy"][wildcards.entropyFileIndex]
@@ -24,7 +24,7 @@ rule copyRepo:
     output:
         directory("src/{entropyFileIndex}")
     shell:
-        "cp -R {input.srcDir}/ToyExamples {output}"
+        "cp -R {input.srcDir} {output}"
 
 
 rule runCompilation:

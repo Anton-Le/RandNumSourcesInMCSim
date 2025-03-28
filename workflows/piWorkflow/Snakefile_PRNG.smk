@@ -1,4 +1,4 @@
-configfile: "configuration.yaml"
+configfile: "configuration_PRNG.yaml"
 
 precisions=['single', 'double']
 entropyFiles=[idx for idx in range(1,10+1)]
@@ -24,7 +24,7 @@ rule copyRepo:
     output:
         directory("src/{entropyFileIndex}")
     shell:
-        "cp -R {input.srcDir}/ToyExamples {output}"
+        "cp -R {input.srcDir} {output}"
 
 
 #ruleorder: substituteEntropyFile > copyRepo
@@ -42,7 +42,7 @@ rule runCompilation:
     shell:
         "mkdir {output} && "
         "cd {output} && "
-        "cmake -DCMAKE_CXX_FLAGS='{params.precisionOption} -march=native' ../../../{input} &&"
+        "cmake -DCMAKE_CXX_FLAGS='{params.precisionOption} -march=native' ../../../{input}/DSMCPI &&"
         "make"
 
 rule collectBinaries:
@@ -94,11 +94,9 @@ rule collectData:
         "run/{entropyFileIndex}/{precision}/assay.sh",
         "run/{entropyFileIndex}/{precision}/instantiated"
     output:
-        "run/{entropyFileIndex}/{precision}/results_assay_{entropyFileIndex}_*.txt", 
         touch("run/{entropyFileIndex}/{precision}/completed")
     threads: 1
     shell:
         "cd run/{wildcards.entropyFileIndex}/{wildcards.precision} && "
         "./assay.sh"
 
-# visualisation & batch processing

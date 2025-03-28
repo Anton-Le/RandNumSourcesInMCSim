@@ -14,7 +14,7 @@ entropy:
  '8': 7777
  '9': 1
  '10': -1
-repoPath: '/programs/projects/MCMCMI_QRNG'
+repoPath: '<abs. path to the entire repository>'
 # visualisation parameters
 maxY: 0.085
 minY: 0.04
